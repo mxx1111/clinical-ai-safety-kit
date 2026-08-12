@@ -1,6 +1,6 @@
 # Governance
 
-MedAgentGuard is maintained under an AI-written, human-governed model.
+Clinical AI Safety Kit is maintained under an AI-written, human-governed model.
 
 ## Human maintainers
 

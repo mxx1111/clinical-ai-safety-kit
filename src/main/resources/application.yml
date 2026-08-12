@@ -1,6 +1,6 @@
 spring:
   application:
-    name: medagent-guard
+    name: clinical-ai-safety-kit
   jackson:
     default-property-inclusion: non_null
 
@@ -19,6 +19,6 @@ server:
 
 info:
   app:
-    name: MedAgentGuard
+    name: Clinical AI Safety Kit
     description: Safety evaluation gateway for medical AI applications
     version: 0.1.0

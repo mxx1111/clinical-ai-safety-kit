@@ -1,4 +1,4 @@
-# Contributing to MedAgentGuard
+# Contributing to Clinical AI Safety Kit
 
 Thanks for helping build safer medical AI infrastructure.
 

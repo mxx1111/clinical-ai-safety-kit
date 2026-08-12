@@ -12,11 +12,11 @@
     </parent>
 
     <groupId>io.github.mxx1111</groupId>
-    <artifactId>medagent-guard</artifactId>
+    <artifactId>clinical-ai-safety-kit</artifactId>
     <version>0.1.0</version>
-    <name>MedAgentGuard</name>
+    <name>Clinical AI Safety Kit</name>
     <description>Safety evaluation gateway for medical AI applications</description>
-    <url>https://github.com/mxx1111/medagent-guard</url>
+    <url>https://github.com/mxx1111/clinical-ai-safety-kit</url>
 
     <licenses>
         <license>
