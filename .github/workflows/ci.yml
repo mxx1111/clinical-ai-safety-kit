@@ -29,6 +29,9 @@ jobs:
       - name: Test MONAI Deploy integration adapter
         run: python3 -m unittest discover -s integrations/monai-deploy/tests -p 'test_*.py'
 
+      - name: Test privacy-safe public metrics collector
+        run: python3 -m unittest discover -s scripts/tests -p 'test_*.py'
+
       - name: Validate all committed receipts
         run: python3 scripts/verify_agent_receipt.py --all
 

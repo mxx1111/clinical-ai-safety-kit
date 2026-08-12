@@ -176,6 +176,8 @@ python3 scripts/verify_agent_receipt.py --all
 
 第一次使用？欢迎用合成数据或经过合规脱敏的信息[提交隐私安全的反馈](https://github.com/mxx1111/clinical-ai-safety-kit/issues/new?template=first-user-feedback.yml)，也可以查看[开放中的 AI Agent 任务](https://github.com/mxx1111/clinical-ai-safety-kit/issues?q=is%3Aissue+is%3Aopen+label%3Aagent-task)。
 
+维护者可以通过公开的 GitHub 汇总数据生成[隐私安全的项目指标](docs/metrics.md#简体中文)。采集器不会在应用中加入遥测，也不会保存用户标识。
+
 ## 路线图
 
 - `v0.1`：确定性规则引擎、REST API、AI 贡献门禁。✅

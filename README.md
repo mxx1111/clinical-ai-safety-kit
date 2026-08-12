@@ -176,6 +176,8 @@ See [AI_CONTRIBUTION_POLICY.md](AI_CONTRIBUTION_POLICY.md) and [CONTRIBUTING.md]
 
 First-time user? [Share privacy-safe feedback](https://github.com/mxx1111/clinical-ai-safety-kit/issues/new?template=first-user-feedback.yml) using synthetic or properly de-identified information only. You can also browse the [open AI Agent tasks](https://github.com/mxx1111/clinical-ai-safety-kit/issues?q=is%3Aissue+is%3Aopen+label%3Aagent-task).
 
+Maintainers can generate [privacy-safe public project metrics](docs/metrics.md) from aggregate GitHub counts. The collector adds no application telemetry and stores no user identifiers.
+
 ## Roadmap
 
 - `v0.1`: deterministic rule engine, REST API, and AI contribution gate. ✅

@@ -1,0 +1,33 @@
+name: Public repository metrics
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 3 * * 1"
+
+permissions:
+  contents: read
+  actions: read
+  issues: read
+  pull-requests: read
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Collect public aggregate metrics
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python3 scripts/collect_public_metrics.py --repository "${GITHUB_REPOSITORY}" --output target/public-metrics.json
+
+      - name: Upload metrics snapshot
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: public-metrics-${{ github.run_id }}
+          path: target/public-metrics.json
+          if-no-files-found: error
+          retention-days: 30
