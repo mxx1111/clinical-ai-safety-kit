@@ -1,0 +1,15 @@
+{
+  "resourceType": "Bundle",
+  "id": "synthetic-example-bundle",
+  "type": "collection",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:22222222-2222-2222-2222-222222222222",
+      "resource": {
+        "resourceType": "Patient",
+        "id": "synthetic-example-patient",
+        "active": true
+      }
+    }
+  ]
+}

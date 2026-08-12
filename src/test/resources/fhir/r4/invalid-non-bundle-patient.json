@@ -1,0 +1,10 @@
+{
+  "resourceType": "Patient",
+  "id": "synthetic-not-a-bundle",
+  "identifier": [
+    {
+      "system": "https://example.invalid/synthetic-patient-id",
+      "value": "SYNTHETIC-NON-BUNDLE-SECRET"
+    }
+  ]
+}

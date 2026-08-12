@@ -1,0 +1,25 @@
+{
+  "resourceType": "Bundle",
+  "id": "synthetic-valid-bundle",
+  "type": "collection",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:11111111-1111-1111-1111-111111111111",
+      "resource": {
+        "resourceType": "Patient",
+        "id": "synthetic-patient-one",
+        "identifier": [
+          {
+            "system": "https://example.invalid/synthetic-patient-id",
+            "value": "SYNTHETIC-0001"
+          }
+        ],
+        "name": [
+          {
+            "text": "Synthetic Example Patient"
+          }
+        ]
+      }
+    }
+  ]
+}

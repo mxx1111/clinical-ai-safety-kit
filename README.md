@@ -22,7 +22,7 @@ MedAgentGuard 不是医疗器械，不能代替医生、急救服务或专业医
 
 ## 当前 MVP
 
-首个版本提供四条双语安全规则：
+当前版本提供四条双语文本安全规则：
 
 | 规则 | 说明 | 默认级别 |
 | --- | --- | --- |
@@ -32,6 +32,8 @@ MedAgentGuard 不是医疗器械，不能代替医生、急救服务或专业医
 | `MAG-DIAGNOSIS-001` | 将诊断表述为毫无依据的确定结论 | High |
 
 这些规则是安全防线，不是临床知识库。规则命中表示“需要人工或上游系统进一步审查”，不表示医学判断本身成立。
+
+项目同时提供隔离的 HAPI FHIR R4 Bundle 结构校验入口。公共 REST DTO 不暴露 HAPI 或 HL7 Java 类型，便于未来替换或升级底层实现。
 
 ## 快速开始
 
@@ -55,6 +57,14 @@ curl -sS http://localhost:8080/api/v1/evaluations \
 curl -sS http://localhost:8080/api/v1/rules
 ```
 
+校验一个合成 FHIR R4 Bundle：
+
+```bash
+curl -sS http://localhost:8080/api/v1/fhir/r4/bundles/validate \
+  -H 'Content-Type: application/fhir+json' \
+  --data @examples/fhir-r4-bundle-valid.json
+```
+
 运行验证：
 
 ```bash
@@ -75,6 +85,41 @@ python3 scripts/verify_agent_receipt.py --all
   }
 }
 ```
+
+## FHIR R4 Bundle 校验
+
+`POST /api/v1/fhir/r4/bundles/validate` 直接接收 FHIR JSON，支持 `application/fhir+json` 和 `application/json`。请求体上限为 1,000,000 个字符。
+
+成功解析的 Bundle 返回 HTTP 200：
+
+```json
+{
+  "status": "VALID",
+  "fhirVersion": "R4",
+  "resourceType": "Bundle",
+  "bundleType": "collection",
+  "entryCount": 1,
+  "findings": []
+}
+```
+
+当前结构规则：
+
+| 代码 | 条件 |
+| --- | --- |
+| `MAG-FHIR-BUNDLE-TYPE-001` | 缺少必需的 `Bundle.type` |
+| `MAG-FHIR-BUNDLE-REQUEST-001` | batch、transaction 或 history 条目缺少 `request` |
+| `MAG-FHIR-BUNDLE-DOCUMENT-001` | document Bundle 未以 Composition 开头 |
+
+以下请求会返回 HTTP 400 和稳定错误码：
+
+| 代码 | 条件 |
+| --- | --- |
+| `MAG-FHIR-PARSE-001` | 请求不是可解析的 FHIR R4 JSON |
+| `MAG-FHIR-RESOURCE-001` | 资源不是 Bundle |
+| `MAG-FHIR-SIZE-001` | 请求超过大小限制 |
+
+校验结果和错误证据不会回显患者标识值或原始解析器错误。当前能力是第一层确定性结构检查，并非完整的 HL7 StructureDefinition/Profile、术语或临床有效性校验。
 
 响应节选：
 
@@ -104,7 +149,7 @@ python3 scripts/verify_agent_receipt.py --all
 ## 路线图
 
 - `v0.1`：确定性规则引擎、REST API、AI 贡献门禁。✅
-- `v0.2`：合成 FHIR Bundle、FHIR 结构校验、批量评测。
+- `v0.2`：合成 FHIR Bundle 与 FHIR 结构校验 ✅；批量评测待完成。
 - `v0.3`：OpenAI-compatible 与本地模型适配器、JSON/HTML 报告。
 - `v0.4`：Prompt Injection、引用真实性和可配置规则包。
 - `v1.0`：稳定规则 SPI、版本化策略包、公开安全评测套件。
@@ -112,6 +157,8 @@ python3 scripts/verify_agent_receipt.py --all
 ## English
 
 MedAgentGuard is an open-source safety evaluation gateway for medical AI applications. It uses deterministic, explainable, and testable rules to flag unsafe escalation behavior, unsupported medication dosages, sensitive identifier leakage, and unjustified diagnostic certainty.
+
+It also exposes an isolated HAPI FHIR R4 Bundle validation endpoint. The current validator checks a focused set of deterministic structural invariants; it is not a complete profile, terminology, or clinical-validity validator.
 
 The project is **AI-written and human-governed**. Humans define intent and retain legal responsibility; agents write code, tests, documentation, and reviews with machine-readable provenance receipts.
 
