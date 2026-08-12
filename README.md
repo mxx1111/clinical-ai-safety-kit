@@ -4,7 +4,13 @@
 [![AI Contribution Gate](https://github.com/mxx1111/medagent-guard/actions/workflows/agent-gate.yml/badge.svg)](https://github.com/mxx1111/medagent-guard/actions/workflows/agent-gate.yml)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 
+[中文](#中文) · [English](#english)
+
+## 中文
+
 MedAgentGuard 是一个面向医疗 AI 应用的开源安全评测网关。它通过确定性、可解释、可测试的规则，检查模型输出中的紧急情况漏报、无来源药物剂量、敏感信息回显和过度确定诊断等风险。
+
+它适合放在医疗聊天机器人、临床文档助手、检索增强生成（RAG）应用或其他医疗 AI 系统的测试与交付流程中，帮助团队在发布前发现可复现的安全问题。它只报告工程风险，不判断医学结论是否正确。
 
 > 人提问题，AI 写代码；AI 审 AI，证据决定合并。
 
@@ -22,7 +28,7 @@ MedAgentGuard 不是医疗器械，不能代替医生、急救服务或专业医
 
 ## 当前 MVP
 
-当前版本提供四条双语文本安全规则：
+当前源码提供四条双语文本安全规则：
 
 | 规则 | 说明 | 默认级别 |
 | --- | --- | --- |
@@ -33,7 +39,7 @@ MedAgentGuard 不是医疗器械，不能代替医生、急救服务或专业医
 
 这些规则是安全防线，不是临床知识库。规则命中表示“需要人工或上游系统进一步审查”，不表示医学判断本身成立。
 
-项目同时提供隔离的 HAPI FHIR R4 Bundle 结构校验入口。公共 REST DTO 不暴露 HAPI 或 HL7 Java 类型，便于未来替换或升级底层实现。
+项目同时提供隔离的 HL7® FHIR® R4 标准 Bundle 结构校验入口，并使用 HAPI FHIR 作为内部实现。公共 REST DTO 不暴露 HAPI 或 HL7 Java 类型，便于未来替换或升级底层实现。
 
 ## 快速开始
 
@@ -57,7 +63,7 @@ curl -sS http://localhost:8080/api/v1/evaluations \
 curl -sS http://localhost:8080/api/v1/rules
 ```
 
-校验一个合成 FHIR R4 Bundle：
+校验一个合成 FHIR® R4 Bundle：
 
 ```bash
 curl -sS http://localhost:8080/api/v1/fhir/r4/bundles/validate \
@@ -86,9 +92,9 @@ python3 scripts/verify_agent_receipt.py --all
 }
 ```
 
-## FHIR R4 Bundle 校验
+## FHIR® R4 Bundle 校验
 
-`POST /api/v1/fhir/r4/bundles/validate` 直接接收 FHIR JSON，支持 `application/fhir+json` 和 `application/json`。请求体上限为 1,000,000 个字符。
+`POST /api/v1/fhir/r4/bundles/validate` 直接接收 FHIR® JSON，支持 `application/fhir+json` 和 `application/json`。请求体上限为 1,000,000 个字符。
 
 成功解析的 Bundle 返回 HTTP 200：
 
@@ -108,14 +114,14 @@ python3 scripts/verify_agent_receipt.py --all
 | 代码 | 条件 |
 | --- | --- |
 | `MAG-FHIR-BUNDLE-TYPE-001` | 缺少必需的 `Bundle.type` |
-| `MAG-FHIR-BUNDLE-REQUEST-001` | batch、transaction 或 history 条目缺少 `request` |
+| `MAG-FHIR-BUNDLE-REQUEST-001` | batch、transaction 或 history 条目缺少 `request`，或 `method`/`url` 不完整 |
 | `MAG-FHIR-BUNDLE-DOCUMENT-001` | document Bundle 未以 Composition 开头 |
 
 以下请求会返回 HTTP 400 和稳定错误码：
 
 | 代码 | 条件 |
 | --- | --- |
-| `MAG-FHIR-PARSE-001` | 请求不是可解析的 FHIR R4 JSON |
+| `MAG-FHIR-PARSE-001` | 请求不是可解析的 FHIR® R4 JSON |
 | `MAG-FHIR-RESOURCE-001` | 资源不是 Bundle |
 | `MAG-FHIR-SIZE-001` | 请求超过大小限制 |
 
@@ -149,7 +155,7 @@ python3 scripts/verify_agent_receipt.py --all
 ## 路线图
 
 - `v0.1`：确定性规则引擎、REST API、AI 贡献门禁。✅
-- `v0.2`：合成 FHIR Bundle 与 FHIR 结构校验 ✅；批量评测待完成。
+- `v0.2`：合成 FHIR® Bundle 与结构校验已完成；批量评测待完成。🚧
 - `v0.3`：OpenAI-compatible 与本地模型适配器、JSON/HTML 报告。
 - `v0.4`：Prompt Injection、引用真实性和可配置规则包。
 - `v1.0`：稳定规则 SPI、版本化策略包、公开安全评测套件。
@@ -158,11 +164,105 @@ python3 scripts/verify_agent_receipt.py --all
 
 MedAgentGuard is an open-source safety evaluation gateway for medical AI applications. It uses deterministic, explainable, and testable rules to flag unsafe escalation behavior, unsupported medication dosages, sensitive identifier leakage, and unjustified diagnostic certainty.
 
-It also exposes an isolated HAPI FHIR R4 Bundle validation endpoint. The current validator checks a focused set of deterministic structural invariants; it is not a complete profile, terminology, or clinical-validity validator.
+It is designed for the testing and delivery pipelines of medical chatbots, clinical-document assistants, retrieval-augmented generation (RAG) applications, and other medical AI systems. It reports reproducible engineering risks before release; it does not determine whether a medical conclusion is correct.
+
+> Humans define the problem, AI agents write the contribution, independent AI agents review it, and evidence decides whether it can be merged.
 
 The project is **AI-written and human-governed**. Humans define intent and retain legal responsibility; agents write code, tests, documentation, and reviews with machine-readable provenance receipts.
 
-MedAgentGuard is not a medical device and does not provide medical advice or diagnosis. Only synthetic data may be used in this repository.
+### Project boundaries
+
+MedAgentGuard:
+
+- is an engineering quality and safety evaluation tool for medical AI developers;
+- uses synthetic examples and auditable heuristic rules;
+- returns risk findings and privacy-safe evidence, not medical diagnoses.
+
+MedAgentGuard is not a medical device and does not replace clinicians, emergency services, or professional medical advice. Real patient data, protected health information (PHI), and personally identifiable data must never be submitted to this repository.
+
+### Current MVP
+
+The current source tree provides four bilingual text-safety rules:
+
+| Rule | Detects | Default severity |
+| --- | --- | --- |
+| `MAG-EMERGENCY-001` | Urgent symptoms without immediate escalation advice | Critical |
+| `MAG-MEDICATION-001` | Specific medication dosage without a verifiable source | High |
+| `MAG-PRIVACY-001` | Sensitive patient identifiers repeated from the input | High |
+| `MAG-DIAGNOSIS-001` | Diagnosis presented as unjustified certainty | High |
+
+A finding means that human or upstream-system review is required. It does not establish that a clinical judgment is correct or incorrect.
+
+The project also exposes an isolated Bundle validation endpoint for the HL7® FHIR® R4 standard, using HAPI FHIR internally. The public REST contract does not expose HAPI or HL7 Java types, allowing the internal implementation to be replaced or upgraded independently.
+
+### Quick start
+
+Requirement: JDK 21 or later.
+
+```bash
+./mvnw spring-boot:run
+```
+
+Evaluate a model response:
+
+```bash
+curl -sS http://localhost:8080/api/v1/evaluations \
+  -H 'Content-Type: application/json' \
+  --data @examples/evaluate-emergency.json
+```
+
+List the active rules:
+
+```bash
+curl -sS http://localhost:8080/api/v1/rules
+```
+
+Validate a synthetic FHIR® R4 Bundle:
+
+```bash
+curl -sS http://localhost:8080/api/v1/fhir/r4/bundles/validate \
+  -H 'Content-Type: application/fhir+json' \
+  --data @examples/fhir-r4-bundle-valid.json
+```
+
+Run all repository checks:
+
+```bash
+./mvnw verify
+python3 scripts/verify_agent_receipt.py --all
+```
+
+### FHIR® R4 Bundle validation
+
+`POST /api/v1/fhir/r4/bundles/validate` accepts FHIR® JSON as either `application/fhir+json` or `application/json`, with a maximum request size of 1,000,000 characters.
+
+The deterministic validator currently checks required `Bundle.type` values; complete `request`, `method`, and `url` fields for batch/transaction/history Bundle entries; and the first Composition entry in document Bundles. Malformed JSON, non-Bundle resources, and oversized payloads return stable privacy-safe error codes. Findings never echo submitted patient identifiers or raw parser errors.
+
+This is a focused first layer of structural validation. It is not a complete HL7 StructureDefinition/Profile, terminology, interoperability, or clinical-validity validator.
+
+### AI-only contribution workflow
+
+1. A human or AI agent opens an Issue with measurable acceptance criteria.
+2. An implementation agent writes the code, tests, documentation, and contribution receipt.
+3. An independent AI agent reviews the actual change.
+4. The pull request includes one machine-readable receipt under `.ai/receipts/` and passes the Agent Gate.
+5. A human maintainer handles governance, legal decisions, risk acceptance, and the final merge without directly editing the proposed contribution.
+
+See [AI_CONTRIBUTION_POLICY.md](AI_CONTRIBUTION_POLICY.md) and [CONTRIBUTING.md](CONTRIBUTING.md) for the full rules.
+
+### Roadmap
+
+- `v0.1`: deterministic rule engine, REST API, and AI contribution gate. ✅
+- `v0.2`: synthetic FHIR® Bundles and structural validation are complete; batch evaluation is pending. 🚧
+- `v0.3`: OpenAI-compatible and local-model adapters, plus JSON/HTML reports.
+- `v0.4`: prompt-injection checks, citation-grounding checks, and configurable rule packs.
+- `v1.0`: stable rule SPI, versioned policy packs, and a public safety evaluation suite.
+
+## Trademark notice / 商标说明
+
+HL7®, FHIR® and the FHIR [FLAME DESIGN]® are registered trademarks of Health Level Seven International. Their use in this project does not constitute endorsement by HL7.
+
+HL7®、FHIR® 及 FHIR [FLAME DESIGN]® 是 Health Level Seven International 的注册商标。本项目对这些名称的引用不代表获得 HL7 的批准、认证或背书。
 
 ## License
 

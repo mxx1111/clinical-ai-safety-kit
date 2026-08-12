@@ -1,0 +1,58 @@
+{
+  "schemaVersion": "1.0",
+  "receiptId": "0002-bilingual-readme",
+  "createdAt": "2026-08-12T05:44:45Z",
+  "agent": {
+    "name": "OpenAI Codex",
+    "model": "GPT-5",
+    "tool": "Codex desktop"
+  },
+  "task": {
+    "issue": "https://github.com/mxx1111/medagent-guard/issues/6",
+    "summary": "Make the README substantively bilingual and add accurate HL7 FHIR trademark attribution.",
+    "acceptanceCriteria": [
+      "Add concise Chinese and English value propositions near the top of the README.",
+      "Document current capabilities, boundaries, quick start, contribution model, and roadmap in both languages.",
+      "Add HL7 and FHIR trademark attribution and a non-endorsement statement.",
+      "Keep medical-safety limitations explicit and avoid clinical-validity claims.",
+      "Add exactly one AI contribution receipt and pass repository validation."
+    ]
+  },
+  "scope": {
+    "description": "Bilingual README documentation, accurate FHIR rule descriptions, and HL7/FHIR trademark attribution.",
+    "files": [
+      "README.md",
+      ".ai/receipts/0002-bilingual-readme.json"
+    ]
+  },
+  "evidence": {
+    "tests": [
+      {
+        "command": "JAVA_HOME=$(/usr/libexec/java_home -v 24) ./mvnw verify",
+        "result": "passed"
+      },
+      {
+        "command": "python3 scripts/verify_agent_receipt.py --all",
+        "result": "passed"
+      },
+      {
+        "command": "git diff --check origin/main",
+        "result": "passed"
+      }
+    ],
+    "independentReviewers": [
+      {
+        "agent": "OpenAI Codex test-engineer",
+        "model": "GPT-5",
+        "independent": true,
+        "verdict": "approved"
+      }
+    ]
+  },
+  "attestations": {
+    "syntheticDataOnly": true,
+    "noSecretsOrPhi": true,
+    "licenseReviewed": true,
+    "limitationsDisclosed": true
+  }
+}
