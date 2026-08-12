@@ -1,0 +1,77 @@
+{
+  "schemaVersion": "1.0",
+  "receiptId": "0005-v02-launch-kit",
+  "createdAt": "2026-08-12T08:04:28Z",
+  "agent": {
+    "name": "OpenAI Codex",
+    "model": "GPT-5",
+    "tool": "Codex desktop"
+  },
+  "task": {
+    "issue": "https://github.com/mxx1111/clinical-ai-safety-kit/issues/12",
+    "summary": "Prepare a truthful, bilingual v0.2 launch kit, repository social preview, and privacy-safe first-user feedback path.",
+    "acceptanceCriteria": [
+      "Add bilingual launch copy and draft release notes that accurately describe the current evidence and limitations.",
+      "Add a repository social preview image with accessible alt text and documented AI-generation provenance.",
+      "Add a structured first-user feedback form that prohibits PHI, secrets, private prompts, and real patient data.",
+      "Link the feedback path and open agent tasks from both repository README files.",
+      "Avoid fabricated adoption metrics, clinical-validity claims, production-readiness claims, and third-party endorsement claims.",
+      "Pass existing Java, Python, receipt, content, and independent AI review checks before publication."
+    ]
+  },
+  "scope": {
+    "description": "Bilingual v0.2 launch and release materials, repository social preview assets, privacy-safe feedback intake, project documentation, and contribution evidence.",
+    "files": [
+      "docs/launch-kit.md",
+      "docs/releases/v0.2.0.md",
+      "assets/**",
+      ".github/ISSUE_TEMPLATE/first-user-feedback.yml",
+      "README.md",
+      "README.zh-CN.md",
+      "CHANGELOG.md",
+      ".ai/receipts/0005-v02-launch-kit.json"
+    ]
+  },
+  "evidence": {
+    "tests": [
+      {
+        "command": "JAVA_HOME=$(/usr/libexec/java_home -v 24) ./mvnw verify",
+        "result": "passed"
+      },
+      {
+        "command": "PYTHONWARNINGS=error::ResourceWarning python3 -m unittest discover -s integrations/monai-deploy/tests -p 'test_*.py' -v",
+        "result": "passed"
+      },
+      {
+        "command": "python3 scripts/verify_agent_receipt.py --all",
+        "result": "passed"
+      },
+      {
+        "command": "validate the feedback issue-form YAML, required privacy confirmations, repository labels, and linked GitHub targets",
+        "result": "passed"
+      },
+      {
+        "command": "inspect the 1280x640 social preview dimensions, file size, metadata, rendered text, accessible alt text, and generation provenance",
+        "result": "passed"
+      },
+      {
+        "command": "git diff --check agent/monai-deploy-safety-gate",
+        "result": "passed"
+      }
+    ],
+    "independentReviewers": [
+      {
+        "agent": "OpenAI Codex test-engineer",
+        "model": "GPT-5",
+        "independent": true,
+        "verdict": "approved"
+      }
+    ]
+  },
+  "attestations": {
+    "syntheticDataOnly": true,
+    "noSecretsOrPhi": true,
+    "licenseReviewed": true,
+    "limitationsDisclosed": true
+  }
+}

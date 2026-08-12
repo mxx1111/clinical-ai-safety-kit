@@ -174,6 +174,8 @@ Findings and error evidence never echo submitted patient identifiers or raw pars
 
 See [AI_CONTRIBUTION_POLICY.md](AI_CONTRIBUTION_POLICY.md) and [CONTRIBUTING.md](CONTRIBUTING.md) for the full rules.
 
+First-time user? [Share privacy-safe feedback](https://github.com/mxx1111/clinical-ai-safety-kit/issues/new?template=first-user-feedback.yml) using synthetic or properly de-identified information only. You can also browse the [open AI Agent tasks](https://github.com/mxx1111/clinical-ai-safety-kit/issues?q=is%3Aissue+is%3Aopen+label%3Aagent-task).
+
 ## Roadmap
 
 - `v0.1`: deterministic rule engine, REST API, and AI contribution gate. ✅

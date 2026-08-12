@@ -174,6 +174,8 @@ python3 scripts/verify_agent_receipt.py --all
 
 完整规则见 [AI_CONTRIBUTION_POLICY.md](AI_CONTRIBUTION_POLICY.md) 和 [CONTRIBUTING.md](CONTRIBUTING.md)。
 
+第一次使用？欢迎用合成数据或经过合规脱敏的信息[提交隐私安全的反馈](https://github.com/mxx1111/clinical-ai-safety-kit/issues/new?template=first-user-feedback.yml)，也可以查看[开放中的 AI Agent 任务](https://github.com/mxx1111/clinical-ai-safety-kit/issues?q=is%3Aissue+is%3Aopen+label%3Aagent-task)。
+
 ## 路线图
 
 - `v0.1`：确定性规则引擎、REST API、AI 贡献门禁。✅

@@ -17,6 +17,7 @@ All notable changes to Clinical AI Safety Kit are documented in this file.
 - Versioned bilingual synthetic benchmark with exact-match JSON and Markdown reports.
 - CycloneDX JSON SBOM generation and CI evidence artifacts.
 - Fail-closed MONAI Deploy text safety gate example with a dependency-free client and synthetic tests.
+- Bilingual v0.2 launch kit, privacy-safe first-user feedback form, and original social-preview artwork.
 
 ## 0.1.0 — 2026-08-12
 
