@@ -41,6 +41,24 @@ Clinical AI Safety Kit 不是医疗器械，不能代替医生、急救服务或
 
 项目同时提供隔离的 HL7® FHIR® R4 标准 Bundle 结构校验入口，并使用 HAPI FHIR 作为内部实现。公共 REST DTO 不暴露 HAPI 或 HL7 Java 类型，便于未来替换或升级底层实现。
 
+## 可复现证据
+
+仓库包含版本化的 [`synthetic-text-safety-v1`](benchmarks/synthetic-text-safety-v1.json) 评测基准。它使用 16 个完全合成的中英文案例，为每条现有文本安全规则覆盖“应拦截”和“应放行”结果。如果实际状态或规则码集合与预期不完全一致，构建会失败。
+
+运行完整证据流程：
+
+```bash
+./mvnw verify
+```
+
+该命令会生成：
+
+- `target/benchmark-results/synthetic-text-safety-v1.json`：机器可读的精确匹配结果；
+- `target/benchmark-results/synthetic-text-safety-v1.md`：便于阅读的结果摘要；
+- `target/clinical-ai-safety-kit-sbom.json`：覆盖运行时依赖的 CycloneDX 1.6 软件物料清单。
+
+成功的 CI 会将这些文件作为 `safety-evidence-*` 构建附件保存 30 天。基准一致性只能证明确定性回归覆盖，不能证明临床有效性、治疗质量或真实模型表现。
+
 ## 快速开始
 
 要求：JDK 21 或更高版本。

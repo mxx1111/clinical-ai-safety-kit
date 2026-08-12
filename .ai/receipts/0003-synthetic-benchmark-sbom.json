@@ -1,0 +1,73 @@
+{
+  "schemaVersion": "1.0",
+  "receiptId": "0003-synthetic-benchmark-sbom",
+  "createdAt": "2026-08-12T06:55:51Z",
+  "agent": {
+    "name": "OpenAI Codex",
+    "model": "GPT-5",
+    "tool": "Codex desktop"
+  },
+  "task": {
+    "issue": "https://github.com/mxx1111/clinical-ai-safety-kit/issues/9",
+    "summary": "Add reproducible synthetic text-safety benchmark evidence and a runtime CycloneDX SBOM.",
+    "acceptanceCriteria": [
+      "Add a versioned bilingual synthetic benchmark covering safe and unsafe examples for every current text-safety rule.",
+      "Fail the automated benchmark when the observed status or exact rule-code set differs from the expected result.",
+      "Generate deterministic machine-readable JSON and human-readable Markdown reports without external model or service calls.",
+      "Generate a runtime-only CycloneDX 1.6 JSON SBOM and upload the reports and SBOM as CI artifacts.",
+      "Document reproduction steps and explicit synthetic-only, non-clinical-validity limitations in English and Chinese.",
+      "Pass the full build, receipt verifier, supply-chain checks, and independent AI review."
+    ]
+  },
+  "scope": {
+    "description": "Synthetic bilingual benchmark dataset and regression runner, deterministic evidence reports, CycloneDX SBOM generation, CI artifact upload, source metadata, and bilingual documentation.",
+    "files": [
+      "benchmarks/synthetic-text-safety-v1.json",
+      "src/test/java/io/github/mxx1111/clinicalaisafetykit/engine/SyntheticSafetyBenchmarkTest.java",
+      "pom.xml",
+      ".github/workflows/ci.yml",
+      "README.md",
+      "README.zh-CN.md",
+      "CHANGELOG.md",
+      ".ai/receipts/0003-synthetic-benchmark-sbom.json"
+    ]
+  },
+  "evidence": {
+    "tests": [
+      {
+        "command": "JAVA_HOME=$(/usr/libexec/java_home -v 24) ./mvnw verify",
+        "result": "passed"
+      },
+      {
+        "command": "JAVA_HOME=$(/usr/libexec/java_home -v 24) ./mvnw -Dtest=SyntheticSafetyBenchmarkTest test; repeat and compare SHA-256 for both reports",
+        "result": "passed"
+      },
+      {
+        "command": "jq validate CycloneDX 1.6 metadata, required component scopes, excluded test dependencies, and project VCS URL",
+        "result": "passed"
+      },
+      {
+        "command": "git ls-remote actions/upload-artifact refs/tags/v7.0.1 and verify pinned workflow SHA",
+        "result": "passed"
+      },
+      {
+        "command": "git diff --check",
+        "result": "passed"
+      }
+    ],
+    "independentReviewers": [
+      {
+        "agent": "OpenAI Codex test-engineer",
+        "model": "GPT-5",
+        "independent": true,
+        "verdict": "approved"
+      }
+    ]
+  },
+  "attestations": {
+    "syntheticDataOnly": true,
+    "noSecretsOrPhi": true,
+    "licenseReviewed": true,
+    "limitationsDisclosed": true
+  }
+}

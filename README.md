@@ -41,6 +41,24 @@ After the project rename, existing `MAG-*` rule and error codes remain stable co
 
 The project also exposes an isolated Bundle validation endpoint for the HL7® FHIR® R4 standard, using HAPI FHIR internally. The public REST contract does not expose HAPI or HL7 Java types, allowing the internal implementation to be replaced or upgraded independently.
 
+## Reproducible evidence
+
+The repository includes the versioned [`synthetic-text-safety-v1`](benchmarks/synthetic-text-safety-v1.json) benchmark. Its 16 synthetic cases cover safe and unsafe outcomes in English and Chinese for every current text-safety rule. The build fails if an observed status or exact rule-code set differs from the expected result.
+
+Run the complete evidence workflow:
+
+```bash
+./mvnw verify
+```
+
+The command writes:
+
+- `target/benchmark-results/synthetic-text-safety-v1.json` — machine-readable exact-match results;
+- `target/benchmark-results/synthetic-text-safety-v1.md` — a human-readable summary;
+- `target/clinical-ai-safety-kit-sbom.json` — a CycloneDX 1.6 software bill of materials for runtime dependencies.
+
+Successful CI runs upload these files as a `safety-evidence-*` artifact for 30 days. Benchmark agreement demonstrates deterministic regression coverage only; it is not evidence of clinical validity, treatment quality, or real-world model performance.
+
 ## Quick start
 
 Requirement: JDK 21 or later.

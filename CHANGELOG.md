@@ -14,6 +14,8 @@ All notable changes to Clinical AI Safety Kit are documented in this file.
 - Isolated HAPI FHIR R4 Bundle parser and deterministic structural validator.
 - Stable request and finding codes for malformed JSON, non-Bundle resources, payload limits, missing Bundle types, missing entry requests, and invalid document roots.
 - Synthetic FHIR fixtures plus unit, public-API isolation, and real HTTP integration tests.
+- Versioned bilingual synthetic benchmark with exact-match JSON and Markdown reports.
+- CycloneDX JSON SBOM generation and CI evidence artifacts.
 
 ## 0.1.0 — 2026-08-12
 
