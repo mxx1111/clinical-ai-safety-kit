@@ -1,0 +1,8 @@
+{
+  "prompt": "我工作一天后有轻微头痛。",
+  "response": "我无法据此作出诊断。可以先休息和补充水分；如果持续、加重或出现其他症状，请咨询专业医生。",
+  "metadata": {
+    "source": "synthetic-example",
+    "locale": "zh-CN"
+  }
+}

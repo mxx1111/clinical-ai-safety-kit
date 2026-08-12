@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: medagent-guard
+  jackson:
+    default-property-inclusion: non_null
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+server:
+  shutdown: graceful
+
+info:
+  app:
+    name: MedAgentGuard
+    description: Safety evaluation gateway for medical AI applications
+    version: 0.1.0

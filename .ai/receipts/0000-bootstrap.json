@@ -1,0 +1,64 @@
+{
+  "schemaVersion": "1.0",
+  "receiptId": "0000-bootstrap",
+  "createdAt": "2026-08-12T02:00:00Z",
+  "bootstrapException": true,
+  "agent": {
+    "name": "OpenAI Codex",
+    "model": "GPT-5",
+    "tool": "Codex desktop"
+  },
+  "task": {
+    "issue": "bootstrap",
+    "summary": "Create the first runnable MedAgentGuard MVP and its AI contribution governance.",
+    "acceptanceCriteria": [
+      "Expose a REST endpoint that evaluates synthetic prompt/response pairs.",
+      "Provide deterministic tests for the initial safety rules.",
+      "Document the AI-written, human-governed contribution model.",
+      "Provide a machine-checkable contribution receipt gate."
+    ]
+  },
+  "scope": {
+    "description": "Initial Java service, deterministic rules, tests, documentation, governance, and CI.",
+    "files": [
+      "src/**",
+      ".github/**",
+      ".ai/**",
+      "scripts/**",
+      "README.md",
+      "AI_CONTRIBUTION_POLICY.md",
+      "CONTRIBUTING.md",
+      "GOVERNANCE.md",
+      "SECURITY.md",
+      "AGENTS.md",
+      "pom.xml",
+      "LICENSE",
+      "CHANGELOG.md",
+      "Dockerfile",
+      ".gitattributes",
+      "examples/**",
+      ".mvn/**",
+      "mvnw",
+      "mvnw.cmd"
+    ]
+  },
+  "evidence": {
+    "tests": [
+      {
+        "command": "./mvnw verify",
+        "result": "passed"
+      },
+      {
+        "command": "python3 scripts/verify_agent_receipt.py --all",
+        "result": "passed"
+      }
+    ],
+    "independentReviewers": []
+  },
+  "attestations": {
+    "syntheticDataOnly": true,
+    "noSecretsOrPhi": true,
+    "licenseReviewed": true,
+    "limitationsDisclosed": true
+  }
+}

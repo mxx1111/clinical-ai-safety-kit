@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mxx1111/medagent-guard/.ai/receipt.schema.json",
+  "title": "MedAgentGuard AI Contribution Receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "receiptId",
+    "createdAt",
+    "agent",
+    "task",
+    "scope",
+    "evidence",
+    "attestations"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0" },
+    "receiptId": { "type": "string", "minLength": 1 },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "bootstrapException": { "type": "boolean" },
+    "agent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "model", "tool"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "model": { "type": "string", "minLength": 1 },
+        "tool": { "type": "string", "minLength": 1 }
+      }
+    },
+    "task": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["issue", "summary", "acceptanceCriteria"],
+      "properties": {
+        "issue": { "type": "string", "minLength": 1 },
+        "summary": { "type": "string", "minLength": 1 },
+        "acceptanceCriteria": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["description", "files"],
+      "properties": {
+        "description": { "type": "string", "minLength": 1 },
+        "files": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tests", "independentReviewers"],
+      "properties": {
+        "tests": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["command", "result"],
+            "properties": {
+              "command": { "type": "string", "minLength": 1 },
+              "result": { "enum": ["passed", "failed", "not-run"] }
+            }
+          }
+        },
+        "independentReviewers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["agent", "model", "verdict", "independent"],
+            "properties": {
+              "agent": { "type": "string", "minLength": 1 },
+              "model": { "type": "string", "minLength": 1 },
+              "verdict": { "enum": ["approved", "changes-requested"] },
+              "independent": { "type": "boolean" }
+            }
+          }
+        }
+      }
+    },
+    "attestations": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "syntheticDataOnly",
+        "noSecretsOrPhi",
+        "licenseReviewed",
+        "limitationsDisclosed"
+      ],
+      "properties": {
+        "syntheticDataOnly": { "const": true },
+        "noSecretsOrPhi": { "const": true },
+        "licenseReviewed": { "const": true },
+        "limitationsDisclosed": { "const": true }
+      }
+    }
+  }
+}
