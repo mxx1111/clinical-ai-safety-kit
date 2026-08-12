@@ -1,0 +1,78 @@
+{
+  "schemaVersion": "1.0",
+  "receiptId": "0006-privacy-safe-public-metrics",
+  "createdAt": "2026-08-12T08:27:13Z",
+  "agent": {
+    "name": "OpenAI Codex",
+    "model": "GPT-5",
+    "tool": "Codex desktop"
+  },
+  "task": {
+    "issue": "https://github.com/mxx1111/clinical-ai-safety-kit/issues/13",
+    "summary": "Define and automate deterministic, privacy-safe aggregate metrics for public repository health.",
+    "acceptanceCriteria": [
+      "Define reach, activation, feedback, contribution, and quality metrics with precise formulas and explicit non-goals.",
+      "Use the privacy-safe first-user feedback form that prohibits PHI, real patient data, secrets, private prompts, and production logs.",
+      "Add a standard-library GitHub collector that emits deterministic aggregate JSON without account identifiers or source text.",
+      "Fail closed on unsafe origins, redirects, bounded-response failures, API errors, and truncated or inconsistent pagination.",
+      "Add a scheduled and manual workflow with read-only permissions that uploads only the aggregate metrics snapshot.",
+      "Add regression tests, bilingual interpretation guidance, exactly one receipt, and independent AI review."
+    ]
+  },
+  "scope": {
+    "description": "Privacy-safe public GitHub metrics collector, deterministic regression tests, read-only scheduled artifact workflow, bilingual definitions, CI coverage, and project documentation.",
+    "files": [
+      "scripts/collect_public_metrics.py",
+      "scripts/tests/test_collect_public_metrics.py",
+      ".github/workflows/public-metrics.yml",
+      ".github/workflows/ci.yml",
+      "docs/metrics.md",
+      "README.md",
+      "README.zh-CN.md",
+      "CHANGELOG.md",
+      ".ai/receipts/0006-privacy-safe-public-metrics.json"
+    ]
+  },
+  "evidence": {
+    "tests": [
+      {
+        "command": "PYTHONWARNINGS=error::ResourceWarning python3 -m unittest discover -s scripts/tests -p 'test_*.py' -v",
+        "result": "passed"
+      },
+      {
+        "command": "JAVA_HOME=$(/usr/libexec/java_home -v 24) ./mvnw --batch-mode --no-transfer-progress verify",
+        "result": "passed"
+      },
+      {
+        "command": "python3 scripts/collect_public_metrics.py --repository mxx1111/clinical-ai-safety-kit --output target/public-metrics.json --as-of 2026-08-12T08:15:00Z",
+        "result": "passed"
+      },
+      {
+        "command": "collect the same 30-day Actions metric for microsoft/vscode and verify the collector fails closed when GitHub reports more than 1,000 matching runs",
+        "result": "passed"
+      },
+      {
+        "command": "verify read-only workflow permissions, pinned action commits, fixed artifact path, feedback form privacy controls, and bilingual metric formulas",
+        "result": "passed"
+      },
+      {
+        "command": "git diff --check agent/v02-launch-kit and check all new files for whitespace errors",
+        "result": "passed"
+      }
+    ],
+    "independentReviewers": [
+      {
+        "agent": "OpenAI Codex test-engineer",
+        "model": "GPT-5",
+        "independent": true,
+        "verdict": "approved"
+      }
+    ]
+  },
+  "attestations": {
+    "syntheticDataOnly": true,
+    "noSecretsOrPhi": true,
+    "licenseReviewed": true,
+    "limitationsDisclosed": true
+  }
+}
