@@ -25,6 +25,7 @@
       "src/test/java/**",
       "src/main/resources/application.yml",
       "README.md",
+      "README.zh-CN.md",
       "pom.xml",
       "Dockerfile",
       "AI_CONTRIBUTION_POLICY.md",
