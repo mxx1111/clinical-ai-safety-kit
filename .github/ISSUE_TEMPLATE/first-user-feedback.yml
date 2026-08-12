@@ -1,0 +1,62 @@
+name: First-user feedback
+description: Share reproducible feedback using synthetic or properly de-identified information only
+title: "[Feedback]: "
+labels:
+  - feedback
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for trying Clinical AI Safety Kit. Describe the workflow and outcome without including real patient data, PHI, identifiers, production logs, secrets, or private prompts. Use a fully synthetic minimal example when reproduction details are needed.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area tested
+      options:
+        - Text safety evaluation API
+        - FHIR R4 Bundle validation
+        - Synthetic benchmark or SBOM
+        - MONAI Deploy integration
+        - Documentation or setup
+        - Other repository workflow
+    validations:
+      required: true
+  - type: textarea
+    id: goal
+    attributes:
+      label: What were you trying to do?
+      description: Describe the engineering goal and environment without identifying a patient, person, institution, or private system.
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: What happened?
+      description: Include stable status and rule codes when useful. Do not paste patient text, production logs, credentials, or private prompts.
+    validations:
+      required: true
+  - type: textarea
+    id: synthetic_reproducer
+    attributes:
+      label: Synthetic minimal reproducer
+      description: Optional. Replace every real value with an invented example and confirm that no source data remains.
+  - type: dropdown
+    id: usefulness
+    attributes:
+      label: Was the result useful for your engineering decision?
+      options:
+        - Yes
+        - Partly
+        - No
+        - Not yet evaluated
+    validations:
+      required: true
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy and safety confirmation
+      options:
+        - label: This feedback contains no real patient data, PHI, personal identifiers, secrets, private prompts, production logs, or proprietary content.
+          required: true
+        - label: I understand that this project is not a medical device and that repository feedback must not be used for diagnosis or treatment decisions.
+          required: true
