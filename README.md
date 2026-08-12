@@ -41,6 +41,10 @@ After the project rename, existing `MAG-*` rule and error codes remain stable co
 
 The project also exposes an isolated Bundle validation endpoint for the HL7® FHIR® R4 standard, using HAPI FHIR internally. The public REST contract does not expose HAPI or HL7 Java types, allowing the internal implementation to be replaced or upgraded independently.
 
+## Integrations
+
+- [MONAI Deploy text safety gate](integrations/monai-deploy/README.md): a fail-closed Python client and `Operator` example that evaluates generated narrative text before a downstream DICOM Text SR writer. The example does not evaluate images or establish clinical validity.
+
 ## Reproducible evidence
 
 The repository includes the versioned [`synthetic-text-safety-v1`](benchmarks/synthetic-text-safety-v1.json) benchmark. Its 16 synthetic cases cover safe and unsafe outcomes in English and Chinese for every current text-safety rule. The build fails if an observed status or exact rule-code set differs from the expected result.

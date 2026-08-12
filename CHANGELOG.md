@@ -16,6 +16,7 @@ All notable changes to Clinical AI Safety Kit are documented in this file.
 - Synthetic FHIR fixtures plus unit, public-API isolation, and real HTTP integration tests.
 - Versioned bilingual synthetic benchmark with exact-match JSON and Markdown reports.
 - CycloneDX JSON SBOM generation and CI evidence artifacts.
+- Fail-closed MONAI Deploy text safety gate example with a dependency-free client and synthetic tests.
 
 ## 0.1.0 — 2026-08-12
 
