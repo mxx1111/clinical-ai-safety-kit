@@ -1,0 +1,14 @@
+{
+  "resourceType": "Bundle",
+  "id": "synthetic-invalid-document",
+  "type": "document",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:33333333-3333-3333-3333-333333333333",
+      "resource": {
+        "resourceType": "Patient",
+        "id": "synthetic-wrong-document-root"
+      }
+    }
+  ]
+}

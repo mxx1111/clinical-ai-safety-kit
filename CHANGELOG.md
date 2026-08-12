@@ -2,6 +2,14 @@
 
 All notable changes to MedAgentGuard are documented in this file.
 
+## Unreleased
+
+### Added
+
+- Isolated HAPI FHIR R4 Bundle parser and deterministic structural validator.
+- Stable request and finding codes for malformed JSON, non-Bundle resources, payload limits, missing Bundle types, missing entry requests, and invalid document roots.
+- Synthetic FHIR fixtures plus unit, public-API isolation, and real HTTP integration tests.
+
 ## 0.1.0 — 2026-08-12
 
 ### Added

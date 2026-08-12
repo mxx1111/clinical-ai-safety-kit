@@ -1,0 +1,74 @@
+{
+  "schemaVersion": "1.0",
+  "receiptId": "0001-fhir-r4-bundle-validation",
+  "createdAt": "2026-08-12T02:39:17Z",
+  "agent": {
+    "name": "OpenAI Codex",
+    "model": "GPT-5",
+    "tool": "Codex desktop"
+  },
+  "task": {
+    "issue": "https://github.com/mxx1111/medagent-guard/issues/3",
+    "summary": "Add a privacy-safe, deterministic FHIR R4 Bundle validation adapter and HTTP API.",
+    "acceptanceCriteria": [
+      "Accept FHIR R4 JSON Bundle payloads without exposing HAPI FHIR types in the public API.",
+      "Return stable, privacy-safe errors for malformed JSON, empty payloads, oversized payloads, and non-Bundle resources.",
+      "Report deterministic findings for missing Bundle.type, incomplete entry requests, and invalid document roots.",
+      "Provide at least one valid and five invalid synthetic fixtures with unit and real HTTP regression coverage.",
+      "Document the validation scope, stable codes, dependency choice, and explicit clinical limitations."
+    ]
+  },
+  "scope": {
+    "description": "FHIR R4 validation API, isolated HAPI adapter, synthetic fixtures, regression tests, examples, dependency declaration, and user documentation.",
+    "files": [
+      "src/main/java/io/github/mxx1111/medagentguard/fhir/**",
+      "src/main/java/io/github/mxx1111/medagentguard/web/FhirValidationController.java",
+      "src/main/java/io/github/mxx1111/medagentguard/web/ApiExceptionHandler.java",
+      "src/test/java/io/github/mxx1111/medagentguard/FhirValidationApplicationTest.java",
+      "src/test/java/io/github/mxx1111/medagentguard/fhir/**",
+      "src/test/resources/fhir/r4/**",
+      "examples/fhir-r4-bundle-valid.json",
+      "README.md",
+      "CHANGELOG.md",
+      "pom.xml"
+    ]
+  },
+  "evidence": {
+    "tests": [
+      {
+        "command": "JAVA_HOME=$(/usr/libexec/java_home -v 24) ./mvnw verify",
+        "result": "passed"
+      },
+      {
+        "command": "JAVA_HOME=$(/usr/libexec/java_home -v 24) ./mvnw -Dtest='FhirValidationApplicationTest,HapiFhirR4BundleValidatorTest,FhirPublicApiIsolationTest' test",
+        "result": "passed"
+      },
+      {
+        "command": "java -jar target/medagent-guard-0.1.0.jar --server.port=18081; curl valid and empty FHIR R4 payloads",
+        "result": "passed"
+      },
+      {
+        "command": "python3 scripts/verify_agent_receipt.py --all",
+        "result": "passed"
+      },
+      {
+        "command": "git diff --check origin/main",
+        "result": "passed"
+      }
+    ],
+    "independentReviewers": [
+      {
+        "agent": "OpenAI Codex test-engineer",
+        "model": "GPT-5.6-sol",
+        "independent": true,
+        "verdict": "approved"
+      }
+    ]
+  },
+  "attestations": {
+    "syntheticDataOnly": true,
+    "noSecretsOrPhi": true,
+    "licenseReviewed": true,
+    "limitationsDisclosed": true
+  }
+}

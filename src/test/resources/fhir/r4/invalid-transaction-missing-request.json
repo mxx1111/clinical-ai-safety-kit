@@ -1,0 +1,19 @@
+{
+  "resourceType": "Bundle",
+  "id": "synthetic-invalid-transaction",
+  "type": "transaction",
+  "entry": [
+    {
+      "resource": {
+        "resourceType": "Patient",
+        "id": "synthetic-private-patient",
+        "identifier": [
+          {
+            "system": "https://example.invalid/synthetic-patient-id",
+            "value": "SYNTHETIC-DO-NOT-ECHO"
+          }
+        ]
+      }
+    }
+  ]
+}
