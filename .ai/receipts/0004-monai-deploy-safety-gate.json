@@ -1,0 +1,71 @@
+{
+  "schemaVersion": "1.0",
+  "receiptId": "0004-monai-deploy-safety-gate",
+  "createdAt": "2026-08-12T07:49:51Z",
+  "agent": {
+    "name": "OpenAI Codex",
+    "model": "GPT-5",
+    "tool": "Codex desktop"
+  },
+  "task": {
+    "issue": "https://github.com/mxx1111/clinical-ai-safety-kit/issues/11",
+    "summary": "Add a fail-closed MONAI Deploy text safety gate before downstream narrative publication.",
+    "acceptanceCriteria": [
+      "Add a standard-library Python client with strict response validation, bounded requests, bounded timeouts, and privacy-safe errors.",
+      "Add a MONAI Deploy Operator that forwards narrative text only after a consistent PASS decision and fails closed otherwise.",
+      "Restrict plain HTTP to loopback by default and document trusted HTTPS deployment boundaries.",
+      "Add deterministic synthetic unit tests using local stubs and a loopback fake HTTP service.",
+      "Document accurate DICOM Text SR wiring, compatibility limits, privacy boundaries, and MONAI non-affiliation in English and Chinese.",
+      "Run integration tests in CI, preserve existing checks, and obtain independent AI review."
+    ]
+  },
+  "scope": {
+    "description": "Fail-closed MONAI Deploy adapter, strict HTTP client, synthetic regression tests, bilingual integration guidance, CI coverage, and project documentation.",
+    "files": [
+      "integrations/monai-deploy/**",
+      ".github/workflows/ci.yml",
+      "README.md",
+      "README.zh-CN.md",
+      "CHANGELOG.md",
+      ".ai/receipts/0004-monai-deploy-safety-gate.json"
+    ]
+  },
+  "evidence": {
+    "tests": [
+      {
+        "command": "PYTHONWARNINGS=error::ResourceWarning python3 -m unittest discover -s integrations/monai-deploy/tests -p 'test_*.py' -v",
+        "result": "passed"
+      },
+      {
+        "command": "JAVA_HOME=$(/usr/libexec/java_home -v 24) ./mvnw verify",
+        "result": "passed"
+      },
+      {
+        "command": "start packaged Java service on loopback and evaluate synthetic PASS and BLOCK cases through the Python client",
+        "result": "passed"
+      },
+      {
+        "command": "compare adapter and wiring with MONAI Deploy App SDK 3.0.0 and current public Operator sources",
+        "result": "passed"
+      },
+      {
+        "command": "git diff --check agent/synthetic-benchmark-sbom",
+        "result": "passed"
+      }
+    ],
+    "independentReviewers": [
+      {
+        "agent": "OpenAI Codex test-engineer",
+        "model": "GPT-5",
+        "independent": true,
+        "verdict": "approved"
+      }
+    ]
+  },
+  "attestations": {
+    "syntheticDataOnly": true,
+    "noSecretsOrPhi": true,
+    "licenseReviewed": true,
+    "limitationsDisclosed": true
+  }
+}

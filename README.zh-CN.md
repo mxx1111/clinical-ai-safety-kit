@@ -41,6 +41,10 @@ Clinical AI Safety Kit 不是医疗器械，不能代替医生、急救服务或
 
 项目同时提供隔离的 HL7® FHIR® R4 标准 Bundle 结构校验入口，并使用 HAPI FHIR 作为内部实现。公共 REST DTO 不暴露 HAPI 或 HL7 Java 类型，便于未来替换或升级底层实现。
 
+## 集成示例
+
+- [MONAI Deploy 文本安全门](integrations/monai-deploy/README.zh-CN.md)：默认阻断的 Python 客户端与 `Operator` 示例，在生成的叙述性报告进入 DICOM Text SR Writer 前进行评测。该示例不评测图像，也不证明临床有效性。
+
 ## 可复现证据
 
 仓库包含版本化的 [`synthetic-text-safety-v1`](benchmarks/synthetic-text-safety-v1.json) 评测基准。它使用 16 个完全合成的中英文案例，为每条现有文本安全规则覆盖“应拦截”和“应放行”结果。如果实际状态或规则码集合与预期不完全一致，构建会失败。
