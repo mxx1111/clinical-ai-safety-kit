@@ -2,7 +2,7 @@
 
 ## 1. Principle
 
-MedAgentGuard is an AI-written, human-governed open-source project.
+Clinical AI Safety Kit is an AI-written, human-governed open-source project.
 
 - Humans define goals, report problems, make governance decisions, handle credentials, accept legal responsibility, and perform the final merge.
 - AI agents produce source code, tests, documentation, migrations, configuration, and review findings.

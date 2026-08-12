@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/mxx1111/medagent-guard/.ai/receipt.schema.json",
-  "title": "MedAgentGuard AI Contribution Receipt",
+  "$id": "https://github.com/mxx1111/clinical-ai-safety-kit/.ai/receipt.schema.json",
+  "title": "Clinical AI Safety Kit AI Contribution Receipt",
   "type": "object",
   "additionalProperties": false,
   "required": [

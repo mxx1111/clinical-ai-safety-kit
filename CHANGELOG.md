@@ -1,8 +1,13 @@
 # Changelog
 
-All notable changes to MedAgentGuard are documented in this file.
+All notable changes to Clinical AI Safety Kit are documented in this file.
 
 ## Unreleased
+
+### Changed
+
+- Renamed the project from MedAgentGuard to Clinical AI Safety Kit.
+- Preserved all existing `MAG-*` rule and error codes plus REST paths for compatibility.
 
 ### Added
 

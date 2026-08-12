@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate MedAgentGuard AI contribution receipts using only the Python standard library."""
+"""Validate Clinical AI Safety Kit receipts using only the Python standard library."""
 
 from __future__ import annotations
 
@@ -11,7 +11,8 @@ import sys
 from pathlib import Path
 from typing import Any
 
-ROOT = Path(os.environ.get("MEDAGENTGUARD_ROOT", Path(__file__).resolve().parents[1])).resolve()
+ROOT_OVERRIDE = os.environ.get("CLINICAL_AI_SAFETY_KIT_ROOT") or os.environ.get("MEDAGENTGUARD_ROOT")
+ROOT = Path(ROOT_OVERRIDE or Path(__file__).resolve().parents[1]).resolve()
 RECEIPT_DIR = ROOT / ".ai" / "receipts"
 BOOTSTRAP_RECEIPT = RECEIPT_DIR / "0000-bootstrap.json"
 

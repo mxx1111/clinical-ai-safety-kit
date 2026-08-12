@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "receiptId": "0002-bilingual-readme",
+  "receiptId": "0002-project-rename-and-bilingual-readme",
   "createdAt": "2026-08-12T05:44:45Z",
   "agent": {
     "name": "OpenAI Codex",
@@ -8,20 +8,33 @@
     "tool": "Codex desktop"
   },
   "task": {
-    "issue": "https://github.com/mxx1111/medagent-guard/issues/6",
-    "summary": "Make the README substantively bilingual and add accurate HL7 FHIR trademark attribution.",
+    "issue": "https://github.com/mxx1111/clinical-ai-safety-kit/issues/8",
+    "summary": "Adopt the Clinical AI Safety Kit identity and provide accurate bilingual project documentation.",
     "acceptanceCriteria": [
-      "Add concise Chinese and English value propositions near the top of the README.",
-      "Document current capabilities, boundaries, quick start, contribution model, and roadmap in both languages.",
-      "Add HL7 and FHIR trademark attribution and a non-endorsement statement.",
-      "Keep medical-safety limitations explicit and avoid clinical-validity claims.",
-      "Add exactly one AI contribution receipt and pass repository validation."
+      "Rename the GitHub repository and local checkout to clinical-ai-safety-kit.",
+      "Rename Maven identifiers, Java packages, application classes, documentation, badges, and active project metadata.",
+      "Preserve existing MAG rule and error codes, REST paths, and response behavior for compatibility.",
+      "Provide substantive Chinese and English project documentation with accurate HL7 and FHIR trademark attribution.",
+      "Pass the full build, receipt verifier, Docker build, reference scan, and independent AI review."
     ]
   },
   "scope": {
-    "description": "Bilingual README documentation, accurate FHIR rule descriptions, and HL7/FHIR trademark attribution.",
+    "description": "Project identity migration, Java package and artifact rename, bilingual README, governance references, and compatibility documentation.",
     "files": [
+      "src/main/java/**",
+      "src/test/java/**",
+      "src/main/resources/application.yml",
       "README.md",
+      "pom.xml",
+      "Dockerfile",
+      "AI_CONTRIBUTION_POLICY.md",
+      "CONTRIBUTING.md",
+      "GOVERNANCE.md",
+      "CHANGELOG.md",
+      "LICENSE",
+      ".github/workflows/agent-gate.yml",
+      ".ai/receipt.schema.json",
+      "scripts/verify_agent_receipt.py",
       ".ai/receipts/0002-bilingual-readme.json"
     ]
   },
@@ -37,6 +50,14 @@
       },
       {
         "command": "git diff --check origin/main",
+        "result": "passed"
+      },
+      {
+        "command": "docker build -t clinical-ai-safety-kit:rename-check .",
+        "result": "passed"
+      },
+      {
+        "command": "reference scan for legacy project identifiers, packages, URLs, and stable MAG codes",
         "result": "passed"
       }
     ],

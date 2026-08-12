@@ -1,14 +1,14 @@
-# MedAgentGuard
+# Clinical AI Safety Kit
 
-[![CI](https://github.com/mxx1111/medagent-guard/actions/workflows/ci.yml/badge.svg)](https://github.com/mxx1111/medagent-guard/actions/workflows/ci.yml)
-[![AI Contribution Gate](https://github.com/mxx1111/medagent-guard/actions/workflows/agent-gate.yml/badge.svg)](https://github.com/mxx1111/medagent-guard/actions/workflows/agent-gate.yml)
+[![CI](https://github.com/mxx1111/clinical-ai-safety-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/mxx1111/clinical-ai-safety-kit/actions/workflows/ci.yml)
+[![AI Contribution Gate](https://github.com/mxx1111/clinical-ai-safety-kit/actions/workflows/agent-gate.yml/badge.svg)](https://github.com/mxx1111/clinical-ai-safety-kit/actions/workflows/agent-gate.yml)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 
 [中文](#中文) · [English](#english)
 
 ## 中文
 
-MedAgentGuard 是一个面向医疗 AI 应用的开源安全评测网关。它通过确定性、可解释、可测试的规则，检查模型输出中的紧急情况漏报、无来源药物剂量、敏感信息回显和过度确定诊断等风险。
+Clinical AI Safety Kit 是一个面向医疗 AI 应用的开源安全评测工具箱与网关。它通过确定性、可解释、可测试的规则，检查模型输出中的紧急情况漏报、无来源药物剂量、敏感信息回显和过度确定诊断等风险。
 
 它适合放在医疗聊天机器人、临床文档助手、检索增强生成（RAG）应用或其他医疗 AI 系统的测试与交付流程中，帮助团队在发布前发现可复现的安全问题。它只报告工程风险，不判断医学结论是否正确。
 
@@ -18,13 +18,13 @@ MedAgentGuard 是一个面向医疗 AI 应用的开源安全评测网关。它�
 
 ## 项目边界
 
-MedAgentGuard：
+Clinical AI Safety Kit：
 
 - 是医疗 AI 开发者的工程质量与安全评测工具。
 - 使用合成示例和可审计的启发式规则。
 - 输出风险提示及证据，不输出医学诊断。
 
-MedAgentGuard 不是医疗器械，不能代替医生、急救服务或专业医疗建议。项目禁止提交真实患者数据、受保护健康信息（PHI）或任何可识别个人身份的数据。
+Clinical AI Safety Kit 不是医疗器械，不能代替医生、急救服务或专业医疗建议。项目禁止提交真实患者数据、受保护健康信息（PHI）或任何可识别个人身份的数据。
 
 ## 当前 MVP
 
@@ -38,6 +38,8 @@ MedAgentGuard 不是医疗器械，不能代替医生、急救服务或专业医
 | `MAG-DIAGNOSIS-001` | 将诊断表述为毫无依据的确定结论 | High |
 
 这些规则是安全防线，不是临床知识库。规则命中表示“需要人工或上游系统进一步审查”，不表示医学判断本身成立。
+
+项目更名后继续保留 `MAG-*` 规则码和错误码，作为稳定的兼容标识；更名不会改变现有 REST 路径或响应契约。
 
 项目同时提供隔离的 HL7® FHIR® R4 标准 Bundle 结构校验入口，并使用 HAPI FHIR 作为内部实现。公共 REST DTO 不暴露 HAPI 或 HL7 Java 类型，便于未来替换或升级底层实现。
 
@@ -162,7 +164,7 @@ python3 scripts/verify_agent_receipt.py --all
 
 ## English
 
-MedAgentGuard is an open-source safety evaluation gateway for medical AI applications. It uses deterministic, explainable, and testable rules to flag unsafe escalation behavior, unsupported medication dosages, sensitive identifier leakage, and unjustified diagnostic certainty.
+Clinical AI Safety Kit is an open-source safety evaluation toolkit and gateway for medical AI applications. It uses deterministic, explainable, and testable rules to flag unsafe escalation behavior, unsupported medication dosages, sensitive identifier leakage, and unjustified diagnostic certainty.
 
 It is designed for the testing and delivery pipelines of medical chatbots, clinical-document assistants, retrieval-augmented generation (RAG) applications, and other medical AI systems. It reports reproducible engineering risks before release; it does not determine whether a medical conclusion is correct.
 
@@ -172,13 +174,13 @@ The project is **AI-written and human-governed**. Humans define intent and retai
 
 ### Project boundaries
 
-MedAgentGuard:
+Clinical AI Safety Kit:
 
 - is an engineering quality and safety evaluation tool for medical AI developers;
 - uses synthetic examples and auditable heuristic rules;
 - returns risk findings and privacy-safe evidence, not medical diagnoses.
 
-MedAgentGuard is not a medical device and does not replace clinicians, emergency services, or professional medical advice. Real patient data, protected health information (PHI), and personally identifiable data must never be submitted to this repository.
+Clinical AI Safety Kit is not a medical device and does not replace clinicians, emergency services, or professional medical advice. Real patient data, protected health information (PHI), and personally identifiable data must never be submitted to this repository.
 
 ### Current MVP
 
@@ -192,6 +194,8 @@ The current source tree provides four bilingual text-safety rules:
 | `MAG-DIAGNOSIS-001` | Diagnosis presented as unjustified certainty | High |
 
 A finding means that human or upstream-system review is required. It does not establish that a clinical judgment is correct or incorrect.
+
+After the project rename, existing `MAG-*` rule and error codes remain stable compatibility identifiers. The rename does not change current REST paths or response contracts.
 
 The project also exposes an isolated Bundle validation endpoint for the HL7® FHIR® R4 standard, using HAPI FHIR internally. The public REST contract does not expose HAPI or HL7 Java types, allowing the internal implementation to be replaced or upgraded independently.
 
