@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 @Service
 public final class EvaluationEngine {
 
-    public static final String RULE_VERSION = "2026-08-12.1";
+    public static final String RULE_VERSION = "2026-08-17.1";
 
     private final List<GuardRule> rules;
     private final Clock clock;

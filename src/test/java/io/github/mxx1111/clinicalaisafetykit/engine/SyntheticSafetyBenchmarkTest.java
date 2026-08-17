@@ -25,6 +25,24 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.ObjectMapper;
 
+/**
+ * Runs the synthetic benchmark and publishes an honest scorecard.
+ *
+ * <p>Three case categories, three different obligations:
+ *
+ * <ul>
+ *   <li><b>baseline</b> and <b>adversarial</b> cases must match their expected outcome exactly.
+ *       These are ordinary regression protection.</li>
+ *   <li><b>known-gap</b> cases must match {@code currentStatus} — what the engine really does — and
+ *       must still differ from {@code expectedStatus}, the correct answer. That keeps the published
+ *       limitation list truthful in both directions: the build fails if a gap silently regresses,
+ *       and it also fails when someone fixes a gap without promoting the case out of the list.</li>
+ * </ul>
+ *
+ * <p>The published report states a detection rate and a false-positive rate rather than a single
+ * pass percentage. A pass percentage over cases this project wrote, about vocabulary this project
+ * chose, would say almost nothing about whether the rules work.
+ */
 class SyntheticSafetyBenchmarkTest {
 
     private static final Path DATASET = Path.of("benchmarks", "synthetic-text-safety-v1.json");
@@ -32,6 +50,9 @@ class SyntheticSafetyBenchmarkTest {
     private static final Path JSON_REPORT = REPORT_DIRECTORY.resolve("synthetic-text-safety-v1.json");
     private static final Path MARKDOWN_REPORT = REPORT_DIRECTORY.resolve("synthetic-text-safety-v1.md");
     private static final ObjectMapper JSON = new ObjectMapper();
+
+    private static final String CATEGORY_KNOWN_GAP = "known-gap";
+    private static final String CATEGORY_BASELINE = "baseline";
 
     @Test
     void matchesEveryExpectedSyntheticOutcomeAndWritesReports() throws IOException {
@@ -54,70 +75,152 @@ class SyntheticSafetyBenchmarkTest {
                     .map(finding -> finding.ruleCode())
                     .sorted()
                     .toList();
-            List<String> expectedRuleCodes = benchmarkCase.expectedRuleCodes().stream()
-                    .sorted()
-                    .toList();
-            boolean passed = result.status() == benchmarkCase.expectedStatus()
+            List<String> expectedRuleCodes = sorted(benchmarkCase.expectedRuleCodes());
+            boolean matchesCorrectAnswer = result.status() == benchmarkCase.expectedStatus()
                     && actualRuleCodes.equals(expectedRuleCodes);
+
             caseResults.add(new BenchmarkCaseResult(
                     benchmarkCase.id(),
                     benchmarkCase.language(),
                     benchmarkCase.ruleUnderTest(),
+                    benchmarkCase.category(),
                     benchmarkCase.expectedStatus(),
                     result.status(),
                     expectedRuleCodes,
                     actualRuleCodes,
-                    passed));
+                    matchesCorrectAnswer,
+                    benchmarkCase.gapReason()));
         }
 
-        int passedCases = (int) caseResults.stream().filter(BenchmarkCaseResult::passed).count();
-        BenchmarkReport report = new BenchmarkReport(
-                dataset.benchmarkId(),
-                dataset.benchmarkVersion(),
-                EvaluationEngine.RULE_VERSION,
-                caseResults.size(),
-                passedCases,
-                caseResults.size() - passedCases,
-                caseResults.isEmpty() ? 0.0 : (double) passedCases / caseResults.size(),
-                dataset.limitations(),
-                caseResults);
+        writeReports(buildReport(dataset, caseResults));
 
-        writeReports(report);
+        assertActiveRulesAreCoveredInBothLanguages(dataset, engine);
+        assertTrackedBehaviourIsUnchanged(dataset, caseResults);
+        assertKnownGapsAreStillGaps(dataset, caseResults);
+        assertPublishedEvidenceHidesRawInput(dataset);
+    }
 
-        assertThat(dataset.cases()).hasSize(16);
-        assertCompleteBilingualCoverage(dataset, engine);
+    /** baseline and adversarial cases are ordinary regressions: they must be answered correctly. */
+    private static void assertTrackedBehaviourIsUnchanged(
+            BenchmarkDataset dataset, List<BenchmarkCaseResult> caseResults) {
+        Set<String> gapIds = idsWithCategory(dataset, CATEGORY_KNOWN_GAP);
         assertThat(caseResults)
-                .filteredOn(result -> !result.passed())
-                .as("benchmark mismatches; inspect %s", JSON_REPORT)
+                .filteredOn(result -> !gapIds.contains(result.id()))
+                .filteredOn(result -> !result.matchesCorrectAnswer())
+                .as("baseline and adversarial mismatches; inspect %s", JSON_REPORT)
                 .isEmpty();
+    }
+
+    /**
+     * A known gap must behave exactly as documented, and must still be wrong.
+     *
+     * <p>The second half is what keeps the limitation list from rotting. Improving a rule is
+     * supposed to break this test, so the contributor has to move the case into the adversarial set
+     * and shrink the published gap list in the same change.
+     */
+    private static void assertKnownGapsAreStillGaps(
+            BenchmarkDataset dataset, List<BenchmarkCaseResult> caseResults) {
+        Map<String, BenchmarkCaseResult> byId = caseResults.stream()
+                .collect(Collectors.toMap(BenchmarkCaseResult::id, result -> result));
+
+        for (BenchmarkCase benchmarkCase : dataset.cases()) {
+            if (!CATEGORY_KNOWN_GAP.equals(benchmarkCase.category())) {
+                continue;
+            }
+            BenchmarkCaseResult result = byId.get(benchmarkCase.id());
+
+            assertThat(benchmarkCase.currentStatus())
+                    .as("known-gap case %s must document currentStatus", benchmarkCase.id())
+                    .isNotNull();
+            assertThat(benchmarkCase.gapReason())
+                    .as("known-gap case %s must explain the gap", benchmarkCase.id())
+                    .isNotBlank();
+
+            assertThat(result.actualStatus())
+                    .as("documented current behaviour drifted for %s", benchmarkCase.id())
+                    .isEqualTo(benchmarkCase.currentStatus());
+            assertThat(result.actualRuleCodes())
+                    .as("documented current rule codes drifted for %s", benchmarkCase.id())
+                    .isEqualTo(sorted(benchmarkCase.currentRuleCodes()));
+
+            assertThat(result.matchesCorrectAnswer())
+                    .as("%s now answers correctly; promote it out of known-gap and update the "
+                            + "limitation list in README.md and README.zh-CN.md", benchmarkCase.id())
+                    .isFalse();
+        }
+    }
+
+    /** Every active rule keeps a safe and an unsafe baseline example in both languages. */
+    private static void assertActiveRulesAreCoveredInBothLanguages(
+            BenchmarkDataset dataset, EvaluationEngine engine) {
+        Set<String> activeRuleCodes = engine.rules().stream()
+                .map(EvaluationEngine.RuleDescriptor::code)
+                .collect(Collectors.toSet());
+        assertThat(dataset.cases().stream().map(BenchmarkCase::ruleUnderTest).collect(Collectors.toSet()))
+                .containsExactlyInAnyOrderElementsOf(activeRuleCodes);
+        assertThat(dataset.cases().stream().map(BenchmarkCase::id).distinct())
+                .as("case ids must be unique")
+                .hasSize(dataset.cases().size());
+
+        for (String ruleCode : activeRuleCodes) {
+            for (String language : List.of("en", "zh-CN")) {
+                List<BenchmarkCase> coverage = dataset.cases().stream()
+                        .filter(item -> CATEGORY_BASELINE.equals(item.category()))
+                        .filter(item -> item.ruleUnderTest().equals(ruleCode))
+                        .filter(item -> item.language().equals(language))
+                        .toList();
+                assertThat(coverage.stream().filter(item -> item.expectedRuleCodes().isEmpty()))
+                        .as("safe baseline for %s in %s", ruleCode, language)
+                        .hasSize(1);
+                assertThat(coverage.stream()
+                                .filter(item -> item.expectedRuleCodes().equals(List.of(ruleCode))))
+                        .as("unsafe baseline for %s in %s", ruleCode, language)
+                        .hasSize(1);
+            }
+        }
+    }
+
+    private static void assertPublishedEvidenceHidesRawInput(BenchmarkDataset dataset)
+            throws IOException {
         String publishedEvidence = Files.readString(JSON_REPORT) + Files.readString(MARKDOWN_REPORT);
         dataset.cases().forEach(benchmarkCase -> assertThat(publishedEvidence)
                 .as("published evidence must not include raw benchmark input for %s", benchmarkCase.id())
                 .doesNotContain(benchmarkCase.prompt(), benchmarkCase.response()));
     }
 
-    private static void assertCompleteBilingualCoverage(BenchmarkDataset dataset, EvaluationEngine engine) {
-        Set<String> activeRuleCodes = engine.rules().stream()
-                .map(EvaluationEngine.RuleDescriptor::code)
-                .collect(Collectors.toSet());
-        assertThat(dataset.cases().stream().map(BenchmarkCase::ruleUnderTest).collect(Collectors.toSet()))
-                .containsExactlyInAnyOrderElementsOf(activeRuleCodes);
-        assertThat(dataset.cases().stream().map(BenchmarkCase::id).distinct()).hasSize(dataset.cases().size());
+    private static BenchmarkReport buildReport(
+            BenchmarkDataset dataset, List<BenchmarkCaseResult> caseResults) {
+        List<BenchmarkCaseResult> unsafeCases = caseResults.stream()
+                .filter(result -> !result.expectedRuleCodes().isEmpty())
+                .toList();
+        List<BenchmarkCaseResult> safeCases = caseResults.stream()
+                .filter(result -> result.expectedRuleCodes().isEmpty())
+                .toList();
 
-        for (String ruleCode : activeRuleCodes) {
-            for (String language : List.of("en", "zh-CN")) {
-                List<BenchmarkCase> coverage = dataset.cases().stream()
-                        .filter(benchmarkCase -> benchmarkCase.ruleUnderTest().equals(ruleCode))
-                        .filter(benchmarkCase -> benchmarkCase.language().equals(language))
-                        .toList();
-                assertThat(coverage)
-                        .as("safe and unsafe coverage for %s in %s", ruleCode, language)
-                        .hasSize(2);
-                assertThat(coverage.stream().filter(item -> item.expectedRuleCodes().isEmpty())).hasSize(1);
-                assertThat(coverage.stream().filter(item -> item.expectedRuleCodes().equals(List.of(ruleCode))))
-                        .hasSize(1);
-            }
-        }
+        // Detection counts a case only when the engine returns the exact expected rule set. Flagging
+        // an unsafe response for the wrong reason is not a detection.
+        long detected = unsafeCases.stream().filter(BenchmarkCaseResult::matchesCorrectAnswer).count();
+        long falsePositives = safeCases.stream()
+                .filter(result -> !result.actualRuleCodes().isEmpty())
+                .count();
+        long knownGaps = caseResults.stream()
+                .filter(result -> CATEGORY_KNOWN_GAP.equals(result.category()))
+                .count();
+
+        return new BenchmarkReport(
+                dataset.benchmarkId(),
+                dataset.benchmarkVersion(),
+                EvaluationEngine.RULE_VERSION,
+                caseResults.size(),
+                unsafeCases.size(),
+                (int) detected,
+                unsafeCases.isEmpty() ? 0.0 : (double) detected / unsafeCases.size(),
+                safeCases.size(),
+                (int) falsePositives,
+                safeCases.isEmpty() ? 0.0 : (double) falsePositives / safeCases.size(),
+                (int) knownGaps,
+                dataset.limitations(),
+                caseResults);
     }
 
     private static void writeReports(BenchmarkReport report) throws IOException {
@@ -129,33 +232,68 @@ class SyntheticSafetyBenchmarkTest {
 
     private static String toMarkdown(BenchmarkReport report) {
         StringBuilder markdown = new StringBuilder()
-                .append("# Synthetic Text Safety Benchmark v1\n\n")
-                .append("This report measures exact agreement with expected deterministic rule outcomes. ")
+                .append("# Synthetic Text Safety Benchmark\n\n")
+                .append("Deterministic agreement with expected rule outcomes on synthetic input. ")
                 .append("It does not measure clinical validity or real-world model quality.\n\n")
                 .append("- Benchmark: `").append(report.benchmarkId()).append("`\n")
                 .append("- Dataset version: `").append(report.benchmarkVersion()).append("`\n")
                 .append("- Rule version: `").append(report.ruleVersion()).append("`\n")
-                .append("- Exact matches: **").append(report.passedCases()).append("/")
-                .append(report.totalCases()).append("** (")
-                .append(String.format(Locale.ROOT, "%.1f%%", report.exactMatchRate() * 100)).append(")\n\n")
-                .append("| Case | Language | Rule under test | Expected status | Actual status | Expected rules | Actual rules | Result |\n")
-                .append("| --- | --- | --- | --- | --- | --- | --- | --- |\n");
+                .append("- Detection rate on unsafe cases: **").append(report.detectedUnsafeCases())
+                .append("/").append(report.unsafeCases()).append("** (")
+                .append(percentage(report.detectionRate())).append(")\n")
+                .append("- False positives on safe cases: **").append(report.falsePositiveCases())
+                .append("/").append(report.safeCases()).append("** (")
+                .append(percentage(report.falsePositiveRate())).append(")\n")
+                .append("- Documented known gaps: **").append(report.knownGapCases()).append("**\n\n")
+                .append("| Case | Language | Rule | Category | Expected | Actual | Expected rules | ")
+                .append("Actual rules | Correct |\n")
+                .append("| --- | --- | --- | --- | --- | --- | --- | --- | --- |\n");
 
         report.cases().stream()
-                .sorted(Comparator.comparing(BenchmarkCaseResult::id))
+                .sorted(Comparator.comparing(BenchmarkCaseResult::category)
+                        .thenComparing(BenchmarkCaseResult::id))
                 .forEach(result -> markdown
                         .append("| `").append(result.id()).append("` | ")
                         .append(result.language()).append(" | ")
                         .append("`").append(result.ruleUnderTest()).append("` | ")
+                        .append(result.category()).append(" | ")
                         .append(result.expectedStatus()).append(" | ")
                         .append(result.actualStatus()).append(" | ")
                         .append(formatRuleCodes(result.expectedRuleCodes())).append(" | ")
                         .append(formatRuleCodes(result.actualRuleCodes())).append(" | ")
-                        .append(result.passed() ? "PASS" : "FAIL").append(" |\n"));
+                        .append(result.matchesCorrectAnswer() ? "yes" : "no").append(" |\n"));
+
+        List<BenchmarkCaseResult> gaps = report.cases().stream()
+                .filter(result -> CATEGORY_KNOWN_GAP.equals(result.category()))
+                .sorted(Comparator.comparing(BenchmarkCaseResult::id))
+                .toList();
+        if (!gaps.isEmpty()) {
+            markdown.append("\n## Known gaps\n\n")
+                    .append("Cases the current rules answer incorrectly. Published deliberately.\n\n");
+            gaps.forEach(gap -> markdown
+                    .append("- `").append(gap.id()).append("` (")
+                    .append(gap.ruleUnderTest()).append("): ")
+                    .append(gap.gapReason()).append("\n"));
+        }
 
         markdown.append("\n## Limitations\n\n");
         report.limitations().forEach(limitation -> markdown.append("- ").append(limitation).append("\n"));
         return markdown.toString();
+    }
+
+    private static String percentage(double ratio) {
+        return String.format(Locale.ROOT, "%.1f%%", ratio * 100);
+    }
+
+    private static List<String> sorted(List<String> ruleCodes) {
+        return ruleCodes == null ? List.of() : ruleCodes.stream().sorted().toList();
+    }
+
+    private static Set<String> idsWithCategory(BenchmarkDataset dataset, String category) {
+        return dataset.cases().stream()
+                .filter(item -> category.equals(item.category()))
+                .map(BenchmarkCase::id)
+                .collect(Collectors.toSet());
     }
 
     private static String formatRuleCodes(List<String> ruleCodes) {
@@ -168,6 +306,7 @@ class SyntheticSafetyBenchmarkTest {
             String benchmarkId,
             String benchmarkVersion,
             String description,
+            Map<String, String> categories,
             List<String> limitations,
             List<BenchmarkCase> cases) {
     }
@@ -176,21 +315,27 @@ class SyntheticSafetyBenchmarkTest {
             String id,
             String language,
             String ruleUnderTest,
+            String category,
             String prompt,
             String response,
             EvaluationStatus expectedStatus,
-            List<String> expectedRuleCodes) {
+            List<String> expectedRuleCodes,
+            EvaluationStatus currentStatus,
+            List<String> currentRuleCodes,
+            String gapReason) {
     }
 
     record BenchmarkCaseResult(
             String id,
             String language,
             String ruleUnderTest,
+            String category,
             EvaluationStatus expectedStatus,
             EvaluationStatus actualStatus,
             List<String> expectedRuleCodes,
             List<String> actualRuleCodes,
-            boolean passed) {
+            boolean matchesCorrectAnswer,
+            String gapReason) {
     }
 
     record BenchmarkReport(
@@ -198,9 +343,13 @@ class SyntheticSafetyBenchmarkTest {
             String benchmarkVersion,
             String ruleVersion,
             int totalCases,
-            int passedCases,
-            int failedCases,
-            double exactMatchRate,
+            int unsafeCases,
+            int detectedUnsafeCases,
+            double detectionRate,
+            int safeCases,
+            int falsePositiveCases,
+            double falsePositiveRate,
+            int knownGapCases,
             List<String> limitations,
             List<BenchmarkCaseResult> cases) {
     }
