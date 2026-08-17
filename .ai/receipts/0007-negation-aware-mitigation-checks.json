@@ -1,0 +1,60 @@
+{
+  "schemaVersion": "1.0",
+  "receiptId": "0007-negation-aware-mitigation-checks",
+  "createdAt": "2026-08-17T15:40:00Z",
+  "agent": {
+    "name": "Claude Code",
+    "model": "Claude Opus 5",
+    "tool": "Claude Code CLI"
+  },
+  "task": {
+    "issue": "https://github.com/mxx1111/clinical-ai-safety-kit/issues/17",
+    "summary": "Close the negation and incidental-mention bypass shared by every text-safety rule, and replace the self-confirming benchmark with one that publishes detection rate, false-positive rate, and a machine-enforced inventory of known gaps.",
+    "acceptanceCriteria": [
+      "A mitigating phrase must not clear a rule when it is negated within the same clause.",
+      "Negation scope must stop at clause punctuation so that conditional phrasing such as 'if you are not improving, call emergency services' and '如果不舒服，请立即就医' is not misread as a refusal to escalate.",
+      "A dosage citation must be adjacent to the dosage it supports, and ordinary words that carry no source must stop counting as citations.",
+      "A claim of clinical authority must stop counting as a diagnostic limitation statement.",
+      "The benchmark must include adversarial cases and known-gap cases, and must report detection and false-positive rates instead of a single pass percentage.",
+      "Known-gap cases must fail the build both when they regress and when they are silently fixed.",
+      "README.md and README.zh-CN.md must state the remaining limitations, each backed by a benchmark case."
+    ]
+  },
+  "scope": {
+    "description": "Negation-aware and proximity-aware signal matching shared by the text-safety rules, tightened citation and limitation vocabularies, a restructured synthetic benchmark with adversarial and known-gap categories, honest scorecard reporting, and bilingual limitation documentation.",
+    "files": [
+      "src/main/java/io/github/mxx1111/clinicalaisafetykit/rule/SignalMatcher.java",
+      "src/main/java/io/github/mxx1111/clinicalaisafetykit/rule/EmergencyEscalationRule.java",
+      "src/main/java/io/github/mxx1111/clinicalaisafetykit/rule/MedicationCitationRule.java",
+      "src/main/java/io/github/mxx1111/clinicalaisafetykit/rule/DiagnosticCertaintyRule.java",
+      "src/main/java/io/github/mxx1111/clinicalaisafetykit/rule/EvaluationContext.java",
+      "src/main/java/io/github/mxx1111/clinicalaisafetykit/engine/EvaluationEngine.java",
+      "src/test/java/io/github/mxx1111/clinicalaisafetykit/rule/SignalMatcherTest.java",
+      "src/test/java/io/github/mxx1111/clinicalaisafetykit/engine/SyntheticSafetyBenchmarkTest.java",
+      "benchmarks/synthetic-text-safety-v1.json",
+      "README.md",
+      "README.zh-CN.md",
+      "CHANGELOG.md",
+      ".ai/receipts/0007-negation-aware-mitigation-checks.json"
+    ]
+  },
+  "evidence": {
+    "tests": [
+      {
+        "command": "./mvnw verify",
+        "result": "not-run"
+      },
+      {
+        "command": "python3 scripts/verify_agent_receipt.py --all",
+        "result": "not-run"
+      }
+    ],
+    "independentReviewers": []
+  },
+  "attestations": {
+    "syntheticDataOnly": true,
+    "noSecretsOrPhi": true,
+    "licenseReviewed": true,
+    "limitationsDisclosed": true
+  }
+}

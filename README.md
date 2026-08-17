@@ -47,7 +47,17 @@ The project also exposes an isolated Bundle validation endpoint for the HL7® FH
 
 ## Reproducible evidence
 
-The repository includes the versioned [`synthetic-text-safety-v1`](benchmarks/synthetic-text-safety-v1.json) benchmark. Its 16 synthetic cases cover safe and unsafe outcomes in English and Chinese for every current text-safety rule. The build fails if an observed status or exact rule-code set differs from the expected result.
+The repository includes the versioned [`synthetic-text-safety-v1`](benchmarks/synthetic-text-safety-v1.json) benchmark. Its synthetic cases fall into three categories:
+
+| Category | Purpose |
+| --- | --- |
+| `baseline` | A safe and an unsafe example for every rule in English and Chinese. |
+| `adversarial` | Cases built to defeat the rules: negated escalation advice, incidental mentions of source vocabulary, and conditional phrasing that must not be misread as negation. |
+| `known-gap` | Cases the current rules answer **incorrectly**, published on purpose. |
+
+The report states a detection rate on unsafe cases and a false-positive rate on safe cases rather than a single pass percentage. A pass percentage measured over cases this project wrote, about vocabulary this project chose, would say very little about whether the rules work.
+
+`known-gap` cases are enforced in both directions. The build fails if one silently regresses, and it also fails when a rule improvement makes one pass — which forces the contributor to promote the case and shrink the published gap list in the same change. The limitation inventory cannot quietly go stale.
 
 Run the complete evidence workflow:
 
@@ -62,6 +72,22 @@ The command writes:
 - `target/clinical-ai-safety-kit-sbom.json` — a CycloneDX 1.6 software bill of materials for runtime dependencies.
 
 Successful CI runs upload these files as a `safety-evidence-*` artifact for 30 days. Benchmark agreement demonstrates deterministic regression coverage only; it is not evidence of clinical validity, treatment quality, or real-world model performance.
+
+## Known limitations
+
+The rules are lexical. They match vocabulary; they do not understand text. Read this section before deciding what this tool can be relied on for.
+
+**Detection is literal.** Risk signals are fixed phrase lists. A response describing the same emergency in different words is not recognised — "crushing pressure in my chest radiating to my left arm" does not contain `chest pain`, and neither does "我胸口像被石头压住". Anything outside the published vocabulary is invisible, and the vocabulary is short.
+
+**Dosage detection requires a number and a unit.** "Take one tablet three times a day" carries the same risk as "take 500 mg" and is not flagged. Conversely, the pattern matches any number followed by a mass unit, so ordinary nutrition advice such as "add 5 g of fibre" is reported as an uncited medication dosage. That is a false positive, and it is in the benchmark as one.
+
+**Identifier detection requires a label.** `MAG-PRIVACY-001` only fires when the prompt introduces a value with a marker such as `patient id` or `身份证`. A bare identifier echoed verbatim, an email address, a phone number, a medical record number, or a date of birth is not detected. Treat the rule as "labelled-identifier echo", not as privacy coverage.
+
+**Negation handling is a heuristic, not parsing.** Mitigating phrases are discounted when a negation cue appears earlier in the same clause, within a bounded window. This closes the bypasses the benchmark demonstrates. It will not survive an adversary who writes around it, and it can still mis-handle nested or long-range negation.
+
+**A PASS is not a safety claim.** It means no configured rule fired. It is not evidence that a response is clinically appropriate, correctly reasoned, or safe to show a patient.
+
+Every gap named above has a corresponding case in the benchmark, so the claims here are machine-checked rather than aspirational. See the `known-gap` entries in [`synthetic-text-safety-v1.json`](benchmarks/synthetic-text-safety-v1.json) and the generated report.
 
 ## Quick start
 

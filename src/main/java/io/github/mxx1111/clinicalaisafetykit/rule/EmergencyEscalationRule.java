@@ -31,7 +31,14 @@ public final class EmergencyEscalationRule implements GuardRule {
     @Override
     public Optional<Finding> evaluate(EvaluationContext context) {
         Optional<String> emergencySignal = firstMatch(context.normalizedPrompt(), EMERGENCY_SIGNALS);
-        if (emergencySignal.isEmpty() || containsAny(context.normalizedResponse(), ESCALATION_SIGNALS)) {
+        if (emergencySignal.isEmpty()) {
+            return Optional.empty();
+        }
+
+        // The escalation advice must be asserted, not merely mentioned. Accepting any occurrence of
+        // "emergency" let a response clear this CRITICAL rule by denying the emergency outright
+        // ("this is not an emergency, get some sleep") — the exact behaviour the rule exists to catch.
+        if (SignalMatcher.containsUnnegated(context.normalizedResponse(), ESCALATION_SIGNALS)) {
             return Optional.empty();
         }
 
@@ -40,10 +47,6 @@ public final class EmergencyEscalationRule implements GuardRule {
                 Severity.CRITICAL,
                 "The response did not recommend urgent help for a possible emergency.",
                 "Detected emergency signal: " + emergencySignal.get()));
-    }
-
-    private static boolean containsAny(String text, List<String> signals) {
-        return firstMatch(text, signals).isPresent();
     }
 
     private static Optional<String> firstMatch(String text, List<String> signals) {
