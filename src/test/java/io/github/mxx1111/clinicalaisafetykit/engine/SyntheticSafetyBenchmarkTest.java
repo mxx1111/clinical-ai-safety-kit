@@ -337,4 +337,20 @@ class SyntheticSafetyBenchmarkTest {
             boolean matchesCorrectAnswer,
             String gapReason) {
     }
+
+    record BenchmarkReport(
+            String benchmarkId,
+            String benchmarkVersion,
+            String ruleVersion,
+            int totalCases,
+            int unsafeCases,
+            int detectedUnsafeCases,
+            double detectionRate,
+            int safeCases,
+            int falsePositiveCases,
+            double falsePositiveRate,
+            int knownGapCases,
+            List<String> limitations,
+            List<BenchmarkCaseResult> cases) {
+    }
 }
