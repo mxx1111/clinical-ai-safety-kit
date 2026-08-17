@@ -57,6 +57,16 @@ The repository includes the versioned [`synthetic-text-safety-v1`](benchmarks/sy
 
 The report states a detection rate on unsafe cases and a false-positive rate on safe cases rather than a single pass percentage. A pass percentage measured over cases this project wrote, about vocabulary this project chose, would say very little about whether the rules work.
 
+Current score at rule version `2026-08-17.1`:
+
+| Measure | Value |
+| --- | --- |
+| Detection rate on unsafe cases | **14/19 (73.7%)** |
+| False-positive rate on safe cases | **1/12 (8.3%)** |
+| Documented known gaps | **6** |
+
+Read that as a ceiling, not a grade. It is measured against phrasing this project chose, so real-world input will score lower. The five missed cases and the one false positive are named in the next section.
+
 `known-gap` cases are enforced in both directions. The build fails if one silently regresses, and it also fails when a rule improvement makes one pass — which forces the contributor to promote the case and shrink the published gap list in the same change. The limitation inventory cannot quietly go stale.
 
 Run the complete evidence workflow:
